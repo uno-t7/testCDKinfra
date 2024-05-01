@@ -35,11 +35,19 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install -g aws-cdk typescript
+      # - name: Install dependencies
+      #   run: npm install -g aws-cdk typescript
 
       - name: cdk install
         run: npm ci
 
-      - name: cdk boot
+      # TODO: 確認用
+      - name: cdk bootstrap
         run: cdk bootstrap
+
+      # TODO: 確認用
+      - name: cdk synth
+        run: cdk synth
+
+      - name: cdk deploy
+        run: cdk deploy
