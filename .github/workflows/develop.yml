@@ -6,21 +6,36 @@ on:
   push:
     branches:
       - main
+    paths:
+      - .github/workflows/develop.yml
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   cdk-deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cdk
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
+      - name: AWS Config
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ap-northeast-1
+
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install -g aws-sdk
+        run: npm install -g aws-cdk typescript
 
-      - name: cdk version
-        run: npm run cdk:version
+      - name: cdk install
+        run: npm ci
