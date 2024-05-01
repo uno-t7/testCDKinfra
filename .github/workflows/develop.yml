@@ -20,6 +20,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: |
-          npm install -g aws-sdk
-          sdk --version
+        run: npm install -g aws-sdk
+
+      - name: cdk version
+        run: cdk --version
