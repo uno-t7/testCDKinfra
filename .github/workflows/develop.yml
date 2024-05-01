@@ -35,19 +35,21 @@ jobs:
         with:
           node-version: 20
 
+      # TODO: バージョン指定
       - name: Install dependencies
         run: npm install -g aws-cdk typescript
 
-      - name: cdk install
+      - name: CDK install
         run: npm ci
 
       # TODO: 確認用
-      - name: cdk bootstrap
+      - name: CDK bootstrap
         run: cdk bootstrap
 
       # TODO: 確認用
-      - name: cdk synth
+      - name: CDK synth
         run: cdk synth
 
-      - name: cdk deploy
-        run: cdk deploy
+      # TODO: デプロイ検証（値受け渡し等確認）
+      - name: CDK deploy
+        run: cdk deploy -c vpcId=${{ secrets.VPC_ID }}
