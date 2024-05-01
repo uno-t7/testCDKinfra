@@ -40,3 +40,6 @@ jobs:
 
       - name: cdk install
         run: npm ci
+
+      - name: cdk boot
+        run: cdk bootstrap
