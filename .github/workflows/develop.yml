@@ -89,7 +89,7 @@ jobs:
       - name: CDK bootstrap
         run: cdk bootstrap
 
-      # TODO: 確認用
+      # TODO: 確認用 - 2
       # - name: CDK synth
       #   run: cdk synth
 
