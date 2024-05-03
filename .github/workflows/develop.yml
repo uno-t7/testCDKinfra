@@ -4,18 +4,23 @@ run-name: DevelopCDK
 
 on:
   # TODO: 開発中はpush
-  push:
+  pull_request:
     branches:
       - develop
     paths:
+      - cdk/**
       - .github/workflows/develop.yml
+    types:
+      - opened
+      - closed
+      - synchronize
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  cdk-deploy:
+  cdk-diff:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -36,7 +41,44 @@ jobs:
         with:
           node-version: 20
 
-      # TODO: バージョン指定
+      # TODO: バージョン指定（外部管理？）
+      - name: Install dependencies
+        run: npm install -g aws-cdk@2.139.1 typescript@~5.4.5
+
+      - name: CDK install
+        run: npm ci
+
+      - name: CDK bootstrap
+        run: cdk bootstrap
+
+      # TODO: デプロイ検証（値受け渡し等確認）
+      - name: CDK diff
+        run: cdk diff -c vpcId=${{ secrets.VPC_ID }}
+
+  cdk-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cdk
+    environment: develop
+    needs: [cdk-diff]
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: AWS Config
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ap-northeast-1
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # TODO: バージョン指定（外部管理？）
       - name: Install dependencies
         run: npm install -g aws-cdk@2.139.1 typescript@~5.4.5
 
@@ -48,9 +90,11 @@ jobs:
         run: cdk bootstrap
 
       # TODO: 確認用
-      - name: CDK synth
-        run: cdk synth
+      # - name: CDK synth
+      #   run: cdk synth
 
       # TODO: デプロイ検証（値受け渡し等確認）
       - name: CDK deploy
         run: cdk deploy -c vpcId=${{ secrets.VPC_ID }}
+
+    # TODO: cdk diff の結果をpullrequestのコメントに出力する？
